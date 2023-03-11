@@ -48,10 +48,12 @@ interface MathJaxContextStaticProps extends MathJaxOverrideableProps {
 export type MathJaxContextProps = ({
     config?: MathJax2Config
     version: 2
+    insertAt?: ShadowRoot | HTMLHeadElement | null
     onStartup?: (mathJax: MathJax2Object) => void
 } | {
     config?: MathJax3Config
     version?: 3
+    insertAt?: ShadowRoot | HTMLHeadElement | null
     onStartup?: (mathJax: MathJax3Object) => void
 }) & MathJaxContextStaticProps
 
@@ -67,6 +69,7 @@ const MathJaxContext: FC<MathJaxContextProps> = ({
     config,
     version = 3,
     src = version === 2 ? DEFAULT_V2_SRC : DEFAULT_V3_SRC,
+    insertAt,
     onStartup,
     onLoad,
     onError,
@@ -115,7 +118,10 @@ const MathJaxContext: FC<MathJaxContextProps> = ({
         })
         script.addEventListener("error", (e) => rej(e))
 
-        document.getElementsByTagName("head")[0].appendChild(script)
+        if(insertAt)
+            insertAt.appendChild(script)
+        else
+            document.getElementsByTagName("head")[0].appendChild(script)
     }
 
     if(typeof mjContext.current === "undefined") {
